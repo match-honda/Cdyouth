@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CEDAR ユース評価管理 PoC</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root{--bg:#f4f6f8;--card:#fff;--ink:#17212b;--muted:#6b7280;--line:#e5e7eb;--brand:#16324f;--accent:#b7925a;--ok:#1f8f55;--warn:#b7791f;--danger:#b42318}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Yu Gothic",Meiryo,sans-serif;background:var(--bg);color:var(--ink)}
+.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}.side{background:#10263b;color:#fff;padding:22px 16px;position:sticky;top:0;height:100vh}
+.logo{font-weight:800;font-size:20px;line-height:1.35;margin-bottom:4px}.sub{font-size:12px;opacity:.7;margin-bottom:24px}
+.nav button{width:100%;text-align:left;border:0;background:transparent;color:#fff;padding:12px 14px;border-radius:10px;margin:3px 0;cursor:pointer;font-size:14px}.nav button.active,.nav button:hover{background:#ffffff18}
+.main{padding:26px;max-width:1500px;width:100%}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:22px}.title h1{font-size:28px;margin:0 0 5px}.title p{margin:0;color:var(--muted);font-size:14px}
+.controls{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:#fff;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700}.btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.gold{background:var(--accent);color:#fff;border-color:var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 1px 2px #00000008}.kpi .label{font-size:12px;color:var(--muted)}.kpi .num{font-size:30px;font-weight:800;margin-top:6px}.kpi .small{font-size:12px;color:var(--muted);margin-top:4px}
+.section{margin-top:18px}.section h2{font-size:18px;margin:0 0 12px}.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:14px;background:#fff}table{border-collapse:collapse;width:100%;min-width:980px}th,td{padding:11px 10px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:top}th{background:#f8fafc;text-align:left;position:sticky;top:0;z-index:1}.pill{display:inline-flex;align-items:center;padding:4px 9px;border-radius:999px;font-size:12px;font-weight:700}.Blue{background:#e8f1ff;color:#245ea8}.Orange{background:#fff0dc;color:#a85b00}.Silver{background:#eef1f5;color:#5c6773}.Gold{background:#fff3c4;color:#8a6a00}.Platinum{background:#ebe7ff;color:#5947a8}
+.screen{display:none}.screen.active{display:block}.two{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}.formrow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px}.field label{display:block;font-size:11px;color:var(--muted);margin-bottom:5px}.field input,.field select,.field textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;background:#fff;font:inherit}.field textarea{min-height:90px;resize:vertical}
+.personlist{display:grid;gap:8px}.person{padding:12px;border:1px solid var(--line);border-radius:10px;cursor:pointer;background:#fff}.person:hover,.person.selected{border-color:#8aa2ba;background:#f7fbff}.person b{font-size:14px}.person small{display:block;color:var(--muted);margin-top:4px}
+.stagebar{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.stagebox{padding:12px;border-radius:10px;border:1px solid var(--line);text-align:center}.stagebox b{display:block}.stagebox span{font-size:11px;color:var(--muted)}
+.skills{display:grid;gap:8px;margin-top:12px}.skill{display:grid;grid-template-columns:24px 1fr auto;gap:8px;align-items:start;padding:10px;border:1px solid var(--line);border-radius:10px;background:#fff}.skill input{width:18px;height:18px;margin-top:2px}.skill .stage{font-size:11px;color:var(--muted)}
+.notice{padding:12px 14px;border-radius:10px;background:#fff9e8;border:1px solid #f1d58c;font-size:13px;line-height:1.6}.success{background:#eaf8f0;border-color:#a9ddbd}.danger{background:#fff0ef;border-color:#f0b2ad}
+.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.flow .step{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px}.step .n{font-size:11px;color:var(--muted)}.step b{display:block;margin:6px 0}.compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}.compare .head{font-weight:800;font-size:18px;margin-bottom:10px}.compare ul{margin:0;padding-left:20px;line-height:1.8}
+.footer-note{font-size:12px;color:var(--muted);margin-top:12px;line-height:1.7}.right{text-align:right}.nowrap{white-space:nowrap}
+.progress{height:9px;border-radius:999px;background:#e5e7eb;overflow:hidden}.progress>span{display:block;height:100%;background:#254d73}
+@media(max-width:900px){.app{grid-template-columns:1fr}.side{height:auto;position:static}.nav{display:flex;overflow:auto}.nav button{white-space:nowrap}.main{padding:16px}.grid,.two,.compare,.flow{grid-template-columns:1fr}.formrow{grid-template-columns:1fr 1fr}.top{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="side">
+  <div class="logo">CEDAR THE CHOP HOUSE & BAR</div>
+  <div class="sub">ユース評価管理 PoC / CD版</div>
+  <div class="nav">
+    <button class="active" data-screen="dashboard">ダッシュボード</button>
+    <button data-screen="members">ユース一覧</button>
+    <button data-screen="evaluation">四半期評価</button>
+    <button data-screen="submission">提出・Excel出力</button>
+    <button data-screen="rules">制度・運用設計</button>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="top">
+    <div class="title"><h1 id="screenTitle">ダッシュボード</h1><p>現場MGRが四半期評価から提出まで完結する想定</p></div>
+    <div class="controls">
+      <select id="quarter" class="btn"><option>2026 Q1</option><option>2026 Q2</option><option selected>2026 Q3</option><option>2026 Q4</option></select>
+      <button class="btn" onclick="resetDemo()">デモ初期化</button>
+    </div>
+  </div>
+
+  <section id="dashboard" class="screen active">
+    <div class="grid">
+      <div class="card kpi"><div class="label">CD ユース在籍</div><div class="num" id="kpiMembers">9</div><div class="small">キッチン2 / ダイニング7</div></div>
+      <div class="card kpi"><div class="label">今回評価 完了</div><div class="num" id="kpiDone">0</div><div class="small">提出確定した人数</div></div>
+      <div class="card kpi"><div class="label">ステージ変更候補</div><div class="num" id="kpiStage">0</div><div class="small">変更後ステージ ≠ 現ステージ</div></div>
+      <div class="card kpi"><div class="label">時給増額見込</div><div class="num" id="kpiRaise">¥0</div><div class="small">今回提出分 合計/時</div></div>
+    </div>
+    <div class="section">
+      <h2>四半期運用フロー</h2>
+      <div class="flow">
+        <div class="step"><div class="n">STEP 1</div><b>対象者確認</b><span>在籍者・現時給・現ステージを確認</span></div>
+        <div class="step"><div class="n">STEP 2</div><b>スキル確認</b><span>Blue〜Platinumの要件をチェック</span></div>
+        <div class="step"><div class="n">STEP 3</div><b>Q評価</b><span>5〜1の評価と昇給額を入力</span></div>
+        <div class="step"><div class="n">STEP 4</div><b>ステージ判定</b><span>必要に応じ変更後ステージを設定</span></div>
+        <div class="step"><div class="n">STEP 5</div><b>運営管理へ提出</b><span>提出データを確定しExcel出力</span></div>
+      </div>
+    </div>
+    <div class="section card">
+      <h2>今期の確認ポイント</h2>
+      <div class="notice">評価3＝期待通りは原則0円、評価4＝20〜30円、評価5＝30円以上。ステージ変更時は、変更後ステージの下限時給を下回らないように確認してください。</div>
+    </div>
+  </section>
+
+  <section id="members" class="screen">
+    <div class="section">
+      <h2>CD ユース一覧</h2>
+      <div class="tablewrap"><table id="memberTable"><thead><tr>
+        <th>氏名</th><th>職種</th><th>現ステージ</th><th>在籍期間</th><th>滞留期間</th><th>現時給</th><th>前回Q評価</th><th>前回アップ</th><th>前回変更後</th><th></th>
+      </tr></thead><tbody></tbody></table></div>
+    </div>
+  </section>
+
+  <section id="evaluation" class="screen">
+    <div class="two">
+      <div>
+        <div class="card">
+          <h2 style="margin-top:0">1. 評価対象者</h2>
+          <div id="personList" class="personlist"></div>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <h2 style="margin-top:0">2. 基本情報</h2>
+          <div id="evalForm"></div>
+        </div>
+      </div>
+    </div>
+    <div class="section card">
+      <h2>3. スキルチェック</h2>
+      <div class="notice">このPoCではCDダイニングの主要チェック項目を搭載。キッチンは制度ハンドブックの期待役割をベースに簡易チェックを搭載しています。全社版では職種別要件表をマスタ化して差し替え可能です。</div>
+      <div id="skillSummary" style="margin-top:12px"></div>
+      <div id="skills" class="skills"></div>
+    </div>
+    <div class="section card">
+      <h2>4. Q評価・時給アップ・ステージ提出</h2>
+      <div id="quarterForm"></div>
+    </div>
+  </section>
+
+  <section id="submission" class="screen">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap">
+        <div><h2 style="margin:0 0 5px">運営管理 提出データ</h2><div class="footer-note">現行のユース評価表と同じ11項目で出力します。</div></div>
+        <div class="controls">
+          <button class="btn" onclick="downloadCSV()">CSV出力</button>
+          <button class="btn gold" onclick="downloadXLSX()">Excel出力</button>
+          <button class="btn primary" onclick="submitAll()">提出確定</button>
+        </div>
+      </div>
+    </div>
+    <div class="section tablewrap"><table id="submissionTable"><thead><tr>
+      <th>氏名</th><th>所属</th><th>職種</th><th>ステージ</th><th>在籍期間</th><th>ステージ－滞留期間</th><th>現時給</th><th>Q評価</th><th>時給アップ額</th><th>変更後ステージ</th><th>備考</th>
+    </tr></thead><tbody></tbody></table></div>
+    <div class="footer-note">※ PoCはブラウザ内（localStorage）保存です。本番ではGoogle Sheets / AppSheet、またはMicrosoft 365環境ならSharePoint Lists / Power Apps等のデータ基盤へ置き換える想定です。</div>
+  </section>
+
+  <section id="rules" class="screen">
+    <div class="card">
+      <h2 style="margin-top:0">アプリ画面構成</h2>
+      <div class="flow">
+        <div class="step"><div class="n">01</div><b>ダッシュボード</b><span>評価状況・変更候補・増額見込</span></div>
+        <div class="step"><div class="n">02</div><b>ユース一覧</b><span>在籍・現ステージ・時給・前回評価</span></div>
+        <div class="step"><div class="n">03</div><b>四半期評価</b><span>スキル、Q評価、昇給、変更後ステージ</span></div>
+        <div class="step"><div class="n">04</div><b>提出一覧</b><span>現行11項目を自動生成</span></div>
+        <div class="step"><div class="n">05</div><b>本部管理</b><span>全店化時に人財開発・運営管理画面を追加</span></div>
+      </div>
+    </div>
+    <div class="section compare">
+      <div class="card">
+        <div class="head">Before｜現在のExcel提出</div>
+        <ul>
+          <li>各店舗MGRがExcelを開いて対象者を探す</li>
+          <li>前回の評価・ステージ・時給を確認しながら手入力</li>
+          <li>スキルチェックと提出表が別管理になりやすい</li>
+          <li>時給テーブル変更時の確認が人依存</li>
+          <li>メール等でファイル提出、運営管理側で回収・統合</li>
+          <li>誰が未提出かを別途追う必要がある</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="head">After｜アプリ運用</div>
+        <ul>
+          <li>対象者・現時給・現ステージを自動表示</li>
+          <li>スキル評価→Q評価→時給アップ→ステージ変更を1画面で実施</li>
+          <li>前回値・今回値を履歴保存</li>
+          <li>ステージ下限時給との不整合を警告</li>
+          <li>提出一覧を自動生成し、必要ならExcelを1クリック出力</li>
+          <li>本部は全店の提出状況をリアルタイム確認可能</li>
+        </ul>
+      </div>
+    </div>
+    <div class="section card">
+      <h2 style="margin-top:0">制度マスタ（ハンドブック反映）</h2>
+      <div class="tablewrap"><table style="min-width:760px"><thead><tr><th>Stage</th><th>期待役割</th><th>時給設定</th><th>評価頻度</th></tr></thead><tbody>
+      <tr><td><span class="pill Platinum">Platinum</span></td><td>社員メンバーと共に運営に携わる、またはポジションのスペシャリスト</td><td>募集時給＋500円〜（上限2,300円）</td><td>3か月に1回</td></tr>
+      <tr><td><span class="pill Gold">Gold</span></td><td>社員メンバーと共に運営に携わり社員をサポート、またはスペシャリスト</td><td>募集時給＋300〜499円</td><td>3か月に1回</td></tr>
+      <tr><td><span class="pill Silver">Silver</span></td><td>新人ユースの育成、または1つの業務に高いスキル</td><td>募集時給＋200〜299円</td><td>3か月に1回</td></tr>
+      <tr><td><span class="pill Orange">Orange</span></td><td>PDPのユースとしてロールモデル</td><td>募集時給＋50〜199円</td><td>3か月に1回</td></tr>
+      <tr><td><span class="pill Blue">Blue</span></td><td>基礎を学びPDP方針に沿って業務を実践</td><td>募集時給〜</td><td>3か月に1回</td></tr>
+      </tbody></table></div>
+    </div>
+  </section>
+</main>
+</div>
+
+<script>
+const initialMembers = [
+{id:1,name:"小野川 里奈",dept:"CD",job:"キッチン",stage:"Silver",tenure:"2年 1ヵ月",stageTenure:"0年 5ヵ月",wage:1600,prevScore:3,prevRaise:150,prevNext:"Silver",prevNote:"現在募集金額1550円のため、シルバー＋200円を加算し1750円の時給になります。"},
+{id:2,name:"タマン ガンガ ラム",dept:"CD",job:"キッチン",stage:"Blue",tenure:"1年 6ヵ月",stageTenure:"0年 5ヵ月",wage:1400,prevScore:3,prevRaise:150,prevNext:"Blue",prevNote:"現在募集金額1550円のため、上昇額＋150円を加算し1550円の時給になります。"},
+{id:3,name:"田中 ひまり",dept:"CD",job:"ダイニングプランナー",stage:"Orange",tenure:"3年 8ヵ月",stageTenure:"0年 5ヵ月",wage:1500,prevScore:4,prevRaise:20,prevNext:"Orange",prevNote:"チェック済数 ブルー24→25 / オレンジ23→24 / シルバー25→27"},
+{id:4,name:"立木 翔士",dept:"CD",job:"ダイニングプランナー",stage:"Orange",tenure:"3年 3ヵ月",stageTenure:"0年 5ヵ月",wage:1500,prevScore:4,prevRaise:20,prevNext:"Orange",prevNote:"チェック済数 ブルー25/25 / オレンジ18→20 / シルバー10→11 / 朝食19/21"},
+{id:5,name:"コシモヴァ グリソラ マムルジョン キジ",dept:"CD",job:"ダイニングプランナー",stage:"Blue",tenure:"1年 4ヵ月",stageTenure:"0年 5ヵ月",wage:1450,prevScore:3,prevRaise:0,prevNext:"Blue",prevNote:"チェック済数 朝食18→19"},
+{id:6,name:"金子 睦実",dept:"CD",job:"ダイニングプランナー",stage:"Blue",tenure:"1年 3ヵ月",stageTenure:"0年 5ヵ月",wage:1450,prevScore:3,prevRaise:0,prevNext:"Blue",prevNote:"チェック済数 ブルー21→24 / オレンジ9/26"},
+{id:7,name:"井上 柊",dept:"CD",job:"ダイニングプランナー",stage:"Blue",tenure:"0年11ヵ月",stageTenure:"0年 5ヵ月",wage:1450,prevScore:5,prevRaise:50,prevNext:"Orange",prevNote:"チェック済数 ブルー16→25 / オレンジ10→19 / シルバー7→11。Blue→Orange。時給+50円→1500円。"},
+{id:8,name:"沓掛 薫",dept:"CD",job:"ダイニングプランナー",stage:"Orange",tenure:"0年10ヵ月",stageTenure:"0年 5ヵ月",wage:1500,prevScore:3,prevRaise:0,prevNext:"Orange",prevNote:"チェック済数 ブルー18→19 / オレンジ3→6 / シルバー4/28 / 朝食21→22"},
+{id:9,name:"竹入 桜",dept:"CD",job:"ダイニングプランナー",stage:"Blue",tenure:"0年 4ヵ月",stageTenure:"0年 4ヵ月",wage:1450,prevScore:3,prevRaise:0,prevNext:"Blue",prevNote:"チェック済数 ブルー11→15 / オレンジ1/26"}
+];
+
+const diningSkills = [
+["Blue","予約台帳の見方を理解している（名前、時間、卓番、人数、備考）"],
+["Blue","ウェルカム感のあるお出迎えができる（ネームコール、笑顔、声出し等）"],
+["Blue","ビールを正しく注ぐことができる"],
+["Blue","フリードリンクメニューのドリンクを作成できる"],
+["Blue","ワイン・スパークリングワインの抜栓ができる"],
+["Blue","ワインをゲストの前で規定量で正しく注げる"],
+["Blue","お皿の3枚持ちができる"],
+["Blue","PFと共にドリンクと料理を提供できる"],
+["Blue","PFからの指示で料理を提供し説明まで行える"],
+["Blue","担当ゾーン回遊中に得た情報をPFに報告できる"],
+["Blue","PFとDUの間に入り情報伝達ができる"],
+["Blue","1WAY2JOBができている"],
+["Blue","PF指定のボトルワインをセラーから持ってこられる"],
+["Blue","適切なタイミングでドリンクのお伺いができる"],
+["Blue","POS（ハンディー）でオーダーを飛ばせる"],
+["Blue","ゲストから追加オーダーを受けることができる"],
+["Blue","店内清掃ができる"],
+["Blue","自店舗ルールに従ったゴミ捨てを理解している"],
+["Blue","中間バッシングができる"],
+["Blue","テーブルリセットができる"],
+["Blue","サイドテーブルの管理ができる"],
+["Blue","洗い場のオープン＆クローズ業務ができる"],
+["Blue","ダイニングのオープン＆クローズ業務ができる"],
+["Blue","ドリンク場のオープン＆クローズ業務ができる"],
+["Blue","ドリンクからフードまでファーストオーダーテイクができる"],
+["Orange","担当ゾーンの把握、事前情報確認、テーブル・備品準備ができる"],
+["Orange","担当ゾーンを管理し、受入〜料理・退店時間をコントロールできる"],
+["Orange","各種プラン・コース内容を理解しゲストに伝えられる"],
+["Orange","ゲストと会話しコミュニケーションを取れる"],
+["Orange","アラカルト料理・ドリンク内容を理解し説明できる"],
+["Orange","本日物を理解しゲストにおすすめできる"],
+["Orange","アレルギー・ベジタリアン等のイレギュラー対応確認ができる"],
+["Orange","必要情報をDUへ共有できる"],
+["Orange","ゲストの前で取り分けを行える"],
+["Orange","ゲストの前でボトルワインの抜栓ができる"],
+["Orange","RNへ適切な指示を出せる"],
+["Orange","食べ残し時にゲストへヒアリングしDUへ報告できる"],
+["Orange","シーンに合わせた料理・ドリンク提案、ポーションアップ提案ができる"],
+["Orange","利用目的に合わせてサービススタイルを変えられる"],
+["Orange","利用目的や人間関係を汲み取り先読みしたサービスができる"],
+["Orange","接待利用のサービスを担当できる"],
+["Orange","リピートにつながる提案やアクションができる"],
+["Orange","オープンチェック表に基づき適切な状態でOPENできる"],
+["Orange","会計ができる"],
+["Orange","グラスワインとカルトフードのペアリング提案ができる"],
+["Orange","調理法の違いによる仕上がりの違いを説明できる"],
+["Orange","自店舗の魚・鶏・豚・牛に合うワインを説明できる"],
+["Orange","自店舗のグラスワイン品種を把握している"],
+["Silver","自店舗のデシャップスタンバイができる"],
+["Silver","アレルギーの基本対応を把握している"],
+["Silver","オーダーシートから料理提供順序を確認できる"],
+["Silver","複数卓へ同時に声掛けができる"],
+["Silver","ダイニング＆キッチン全体を見ながら料理の声掛けができる"],
+["Silver","PF依頼商品を迅速にキッチンへ声掛けできる"],
+["Silver","声掛けした料理の進捗確認ができる"],
+["Silver","席時間を把握し料理のタイムコントロールができる"],
+["Silver","温冷料理を適温で提供できる"],
+["Silver","料理の食べ残し時にPFへヒアリングし報告できる"],
+["Silver","店の規定通り料理・ドリンクのチェックができる"],
+["Silver","ワイン状態をチェックした上で提供できる"],
+["Silver","自店舗ボトルワインの産地・品種・特徴を把握している"],
+["Silver","社員不在時に時間帯責任者を担える（朝食）"],
+["Silver","後輩の育成・指導ができる"],
+["Silver","後輩へ指示し営業を円滑にできる"],
+["Gold","オープン前に全箇所の準備を最終確認できる"],
+["Gold","不足アサインを自身の判断でフォローできる"],
+["Gold","料理の遅れが出ないようDUに的確な指示を出せる"],
+["Gold","予約状況を見てアサイン（人件費）をコントロールできる"],
+["Gold","ドリンク等の発注業務ができる"],
+["Gold","クレームの初期対応と適切な報告ができる"],
+["Gold","他会場ヘルプでPFができる"],
+["Gold","季節替わりでドリンク新メニュー開発を主導できる"],
+["Gold","顧客動向・店舗特性を理解しワインリスト更新を起案できる"],
+["Gold","前回来店顧客情報を活用し滞在価値向上提案ができる"],
+["Gold","ペアリングを商品化できる"],
+["Gold","ロールプレイを用いたトレーニング実施を主導できる"],
+["Platinum","クレーム対応の判断ができる"],
+["Platinum","入居ビル・クライアントとの折衝ができる"],
+["Platinum","仕入れ値・値付け・流行を理解しメニュー更新ができる"],
+["Platinum","ワインリスト更新ができる"],
+["Platinum","FB商品の改善・開発指示ができる"],
+["Platinum","商品開発商品の評価と改善指示ができる"],
+["Platinum","ロールプレイトレーニング内容を設計・変更できる"]
+];
+
+const kitchenSkills = [
+["Blue","社員・先輩の支援を受けながら業務を遂行できる"],
+["Blue","洗い場・調理補助を推進できる"],
+["Blue","衛生・安全ルールを守って仕込みができる"],
+["Blue","自ポジションの基本準備・片付けができる"],
+["Orange","担当する1ポジションを安定して遂行できる"],
+["Orange","必要な準備を先回りして行動できる"],
+["Orange","営業状況を見て周囲と連携できる"],
+["Orange","料理品質を規定通りに保てる"],
+["Silver","Blue・Orangeレイヤーの育成に携われる"],
+["Silver","後輩メンバーへ指示出しができる"],
+["Silver","キッチンの複数ポジションを遂行できる"],
+["Silver","営業中の優先順位を判断しフォローできる"],
+["Gold","社員メンバーと同水準でキッチン業務にあたれる"],
+["Gold","他セクションと連携しレストラン運営に入れる"],
+["Gold","料理説明・サーブ等、顧客接点にも対応できる"],
+["Gold","品質・生産性の改善提案ができる"],
+["Platinum","Gold以下の要件を満たしている"],
+["Platinum","商品開発に携われる"],
+["Platinum","店舗運営の中核として改善を主導できる"]
+];
+
+let state = JSON.parse(localStorage.getItem("cedarYouthPoc")||"null") || {members:initialMembers, evals:{}, submitted:false};
+let selectedId = state.members[0].id;
+
+function save(){localStorage.setItem("cedarYouthPoc",JSON.stringify(state));renderAll()}
+function resetDemo(){if(confirm("入力したデモデータを初期化しますか？")){state={members:initialMembers,evals:{},submitted:false};selectedId=1;save()}}
+function pill(stage){return `<span class="pill ${stage}">${stage}</span>`}
+function yen(n){return "¥"+Number(n||0).toLocaleString()}
+function getEval(id){return state.evals[id]||{score:"",raise:0,nextStage:state.members.find(m=>m.id==id).stage,note:"",skills:{},done:false}}
+function stageJa(s){return {Blue:"ブルー",Orange:"オレンジ",Silver:"シルバー",Gold:"ゴールド",Platinum:"プラチナ"}[s]||s}
+
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));document.getElementById(b.dataset.screen).classList.add("active");document.getElementById("screenTitle").textContent=b.textContent;if(b.dataset.screen==="submission")renderSubmission()})
+
+function renderAll(){renderDashboard();renderMembers();renderPeople();renderEvaluation();renderSubmission()}
+function renderDashboard(){
+ const es=Object.values(state.evals); document.getElementById("kpiMembers").textContent=state.members.length;
+ document.getElementById("kpiDone").textContent=es.filter(e=>e.done).length;
+ document.getElementById("kpiStage").textContent=state.members.filter(m=>{let e=getEval(m.id);return e.nextStage && e.nextStage!==m.stage}).length;
+ document.getElementById("kpiRaise").textContent=yen(es.reduce((a,e)=>a+(Number(e.raise)||0),0));
+}
+function renderMembers(){
+ const tb=document.querySelector("#memberTable tbody");tb.innerHTML=state.members.map(m=>`<tr>
+ <td><b>${m.name}</b></td><td>${m.job}</td><td>${pill(m.stage)}</td><td>${m.tenure}</td><td>${m.stageTenure}</td><td>${yen(m.wage)}</td>
+ <td>${m.prevScore}</td><td>${yen(m.prevRaise)}</td><td>${pill(m.prevNext)}</td><td><button class="btn" onclick="openEval(${m.id})">評価する</button></td></tr>`).join("")
+}
+function renderPeople(){
+ const el=document.getElementById("personList");el.innerHTML=state.members.map(m=>{let e=getEval(m.id);return `<div class="person ${m.id===selectedId?'selected':''}" onclick="selectPerson(${m.id})"><b>${m.name}</b><small>${m.job} / ${stageJa(m.stage)} / 現時給 ${yen(m.wage)} ${e.done?'・評価完了':''}</small></div>`}).join("")
+}
+function openEval(id){selectedId=id;document.querySelector('[data-screen="evaluation"]').click();renderAll()}
+function selectPerson(id){selectedId=id;renderPeople();renderEvaluation()}
+function renderEvaluation(){
+ const m=state.members.find(x=>x.id===selectedId);if(!m)return;const e=getEval(m.id);
+ document.getElementById("evalForm").innerHTML=`
+ <div class="formrow"><div class="field"><label>氏名</label><input value="${m.name}" disabled></div><div class="field"><label>所属</label><input value="${m.dept}" disabled></div><div class="field"><label>職種</label><input value="${m.job}" disabled></div></div>
+ <div class="formrow"><div class="field"><label>現ステージ</label><input value="${stageJa(m.stage)}" disabled></div><div class="field"><label>在籍期間</label><input value="${m.tenure}" disabled></div><div class="field"><label>ステージ滞留期間</label><input value="${m.stageTenure}" disabled></div></div>
+ <div class="formrow"><div class="field"><label>現時給</label><input type="number" value="${m.wage}" onchange="updateMember('wage',this.value)"></div><div class="field"><label>前回Q評価</label><input value="${m.prevScore}" disabled></div><div class="field"><label>前回アップ額</label><input value="${m.prevRaise}" disabled></div></div>
+ <div class="notice"><b>前回備考：</b>${m.prevNote||"—"}</div>`;
+ const skills=m.job.includes("キッチン")?kitchenSkills:diningSkills;
+ const checked=Object.values(e.skills||{}).filter(Boolean).length;
+ document.getElementById("skillSummary").innerHTML=`<div class="formrow"><div class="field"><label>チェック済</label><div><b>${checked} / ${skills.length}</b></div></div><div class="field"><label>達成率</label><div><b>${Math.round(checked/skills.length*100)}%</b></div></div><div class="field"><label>進捗</label><div class="progress"><span style="width:${checked/skills.length*100}%"></span></div></div></div>`;
+ document.getElementById("skills").innerHTML=skills.map((s,i)=>`<label class="skill"><input type="checkbox" ${e.skills[i]?'checked':''} onchange="toggleSkill(${i},this.checked)"><div>${s[1]}</div><div class="stage">${s[0]}</div></label>`).join("");
+ const warn = salaryWarning(m,e);
+ document.getElementById("quarterForm").innerHTML=`
+ <div class="formrow">
+  <div class="field"><label>Q評価</label><select onchange="updateEval('score',this.value)"><option value="">選択</option>${[5,4,3,2,1].map(x=>`<option ${String(e.score)===String(x)?'selected':''}>${x}</option>`).join("")}</select></div>
+  <div class="field"><label>時給アップ額（円）</label><input type="number" min="0" value="${e.raise||0}" onchange="updateEval('raise',this.value)"></div>
+  <div class="field"><label>変更後ステージ</label><select onchange="updateEval('nextStage',this.value)">${["Blue","Orange","Silver","Gold","Platinum"].map(s=>`<option value="${s}" ${e.nextStage===s?'selected':''}>${stageJa(s)}</option>`).join("")}</select></div>
+ </div>
+ <div class="field"><label>備考</label><textarea onchange="updateEval('note',this.value)" placeholder="チェック済数、ステージ変更理由、時給調整理由など">${e.note||""}</textarea></div>
+ ${warn?`<div class="notice ${warn.type}" style="margin-top:10px">${warn.text}</div>`:""}
+ <div class="controls" style="margin-top:12px"><button class="btn primary" onclick="markDone(${m.id})">${e.done?'評価を更新保存':'この評価を完了'}</button></div>`;
+}
+function updateMember(k,v){let m=state.members.find(x=>x.id===selectedId);m[k]=Number(v)||v;save()}
+function toggleSkill(i,v){let e=getEval(selectedId);e.skills[i]=v;state.evals[selectedId]=e;save()}
+function updateEval(k,v){let e=getEval(selectedId);e[k]=(k==="raise"?Number(v):v);state.evals[selectedId]=e;save()}
+function markDone(id){let e=getEval(id);if(!e.score){alert("Q評価を選択してください");return} e.done=true;state.evals[id]=e;save();alert("評価を保存しました")}
+function salaryWarning(m,e){
+ const base=1550; // CD PoC: 現行提出例で使われている募集時給。管理画面で変更可能にする想定
+ const min={Blue:base,Orange:base+50,Silver:base+200,Gold:base+300,Platinum:base+500}[e.nextStage||m.stage];
+ const proposed=m.wage+(Number(e.raise)||0);
+ if(proposed<min)return {type:"danger",text:`変更後ステージの下限目安 ${yen(min)} に対し、現時給＋今回アップは ${yen(proposed)} です。下限時給への調整確認が必要です。※CD PoCでは募集時給1,550円を仮マスタとして使用。`};
+ if(e.score==3 && Number(e.raise)>0)return {type:"danger",text:"評価3はハンドブック上『期待通り＝0円』です。今回アップ額と整合を確認してください。募集時給変更による下限調整の場合は備考に理由を記載してください。"};
+ if(e.score==4 && (Number(e.raise)<20 || Number(e.raise)>30))return {type:"danger",text:"評価4の時給アップ基準は20〜30円です。"};
+ if(e.score==5 && Number(e.raise)<30)return {type:"danger",text:"評価5の時給アップ基準は30円〜です。"};
+ return null;
+}
+function submissionRows(){
+ return state.members.map(m=>{let e=getEval(m.id);return {
+  "氏名":m.name,"所属":m.dept,"職種":m.job,"ステージ":stageJa(m.stage),"在籍期間":m.tenure,"ステージ－滞留期間":m.stageTenure,
+  "現時給":m.wage,"Q評価":e.score||"","時給アップ額":e.raise||0,"変更後ステージ":stageJa(e.nextStage||m.stage),"備考":e.note||""
+ }});
+}
+function renderSubmission(){
+ const rows=submissionRows();document.querySelector("#submissionTable tbody").innerHTML=rows.map(r=>`<tr>${Object.values(r).map(v=>`<td>${v}</td>`).join("")}</tr>`).join("")
+}
+function downloadCSV(){
+ const rows=submissionRows(),heads=Object.keys(rows[0]);let csv=[heads.join(","),...rows.map(r=>heads.map(h=>`"${String(r[h]).replaceAll('"','""')}"`).join(","))].join("\r\n");
+ const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`CD_ユース評価表_${document.getElementById("quarter").value}.csv`;a.click()
+}
+function downloadXLSX(){
+ if(typeof XLSX==="undefined"){alert("Excelライブラリを読み込めませんでした。CSV出力をご利用ください。");return}
+ const ws=XLSX.utils.json_to_sheet(submissionRows()); const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"ユース評価表");XLSX.writeFile(wb,`CD_ユース評価表_${document.getElementById("quarter").value}.xlsx`)
+}
+function submitAll(){
+ const incomplete=state.members.filter(m=>!getEval(m.id).done);if(incomplete.length&&!confirm(`未完了が${incomplete.length}名います。この状態で提出確定しますか？`))return;
+ state.submitted=true;save();alert("提出確定しました。PoCではブラウザ内に状態を保存しています。")
+}
+renderAll();
+</script>
+</body></html>
