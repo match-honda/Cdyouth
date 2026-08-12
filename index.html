@@ -229,15 +229,15 @@
 <script>
 const STAGES=["Blue","Orange","Silver","Gold","Platinum"];
 const initialMembers = [
-{id:1,name:"キッチン1",dept:"CD",job:"キッチン",stage:"Silver",tenure:"2年 1ヵ月",stageTenure:"0年 5ヵ月",wage:1600,prevScore:3,prevRaise:150,prevNext:"Silver",prevCounts:{},prevNote:"テストデータ：募集時給改定による時給調整例。"},
-{id:2,name:"キッチン2",dept:"CD",job:"キッチン",stage:"Blue",tenure:"1年 6ヵ月",stageTenure:"0年 5ヵ月",wage:1400,prevScore:3,prevRaise:150,prevNext:"Blue",prevCounts:{},prevNote:"テストデータ：募集時給改定による時給調整例。"},
+{id:1,name:"キッチン1（O.R.）",dept:"CD",job:"キッチン",stage:"Silver",tenure:"2年 1ヵ月",stageTenure:"0年 5ヵ月",wage:1600,prevScore:3,prevRaise:150,prevNext:"Silver",prevCounts:{},prevNote:"テストデータ：募集時給改定による時給調整例。"},
+{id:2,name:"キッチン2（T.G.R.）",dept:"CD",job:"キッチン",stage:"Blue",tenure:"1年 6ヵ月",stageTenure:"0年 5ヵ月",wage:1400,prevScore:3,prevRaise:150,prevNext:"Blue",prevCounts:{},prevNote:"テストデータ：募集時給改定による時給調整例。"},
 {id:3,name:"ダイニング1（T.H.）",dept:"CD",job:"ダイニングプランナー",stage:"Orange",tenure:"3年 8ヵ月",stageTenure:"0年 5ヵ月",wage:1500,prevScore:4,prevRaise:20,prevNext:"Orange",prevCounts:{Blue:24,Orange:23,Silver:25,Gold:2,Platinum:0},prevNote:"テストデータ：1Qチェック数を設定。"},
-{id:4,name:"ダイニング2",dept:"CD",job:"ダイニングプランナー",stage:"Orange",tenure:"3年 3ヵ月",stageTenure:"0年 5ヵ月",wage:1500,prevScore:4,prevRaise:20,prevNext:"Orange",prevCounts:{Blue:25,Orange:18,Silver:10,Gold:1,Platinum:0},prevNote:"テストデータ：1Qチェック数を設定。"},
-{id:5,name:"ダイニング3",dept:"CD",job:"ダイニングプランナー",stage:"Blue",tenure:"1年 4ヵ月",stageTenure:"0年 5ヵ月",wage:1450,prevScore:3,prevRaise:0,prevNext:"Blue",prevCounts:{Blue:18,Orange:4,Silver:1,Gold:0,Platinum:0},prevNote:"テストデータ。"},
-{id:6,name:"ダイニング4",dept:"CD",job:"ダイニングプランナー",stage:"Blue",tenure:"1年 3ヵ月",stageTenure:"0年 5ヵ月",wage:1450,prevScore:3,prevRaise:0,prevNext:"Blue",prevCounts:{Blue:21,Orange:9,Silver:2,Gold:0,Platinum:0},prevNote:"テストデータ。"},
-{id:7,name:"ダイニング5",dept:"CD",job:"ダイニングプランナー",stage:"Blue",tenure:"0年11ヵ月",stageTenure:"0年 5ヵ月",wage:1450,prevScore:5,prevRaise:50,prevNext:"Orange",prevCounts:{Blue:16,Orange:10,Silver:7,Gold:0,Platinum:0},prevNote:"テストデータ：ステージアップ例。"},
-{id:8,name:"ダイニング6",dept:"CD",job:"ダイニングプランナー",stage:"Orange",tenure:"0年10ヵ月",stageTenure:"0年 5ヵ月",wage:1500,prevScore:3,prevRaise:0,prevNext:"Orange",prevCounts:{Blue:18,Orange:3,Silver:4,Gold:0,Platinum:0},prevNote:"テストデータ。"},
-{id:9,name:"ダイニング7",dept:"CD",job:"ダイニングプランナー",stage:"Blue",tenure:"0年 4ヵ月",stageTenure:"0年 4ヵ月",wage:1450,prevScore:3,prevRaise:0,prevNext:"Blue",prevCounts:{Blue:11,Orange:1,Silver:0,Gold:0,Platinum:0},prevNote:"テストデータ。"}
+{id:4,name:"ダイニング2（T.S.）",dept:"CD",job:"ダイニングプランナー",stage:"Orange",tenure:"3年 3ヵ月",stageTenure:"0年 5ヵ月",wage:1500,prevScore:4,prevRaise:20,prevNext:"Orange",prevCounts:{Blue:25,Orange:18,Silver:10,Gold:1,Platinum:0},prevNote:"テストデータ：1Qチェック数を設定。"},
+{id:5,name:"ダイニング3（K.G.M.K.）",dept:"CD",job:"ダイニングプランナー",stage:"Blue",tenure:"1年 4ヵ月",stageTenure:"0年 5ヵ月",wage:1450,prevScore:3,prevRaise:0,prevNext:"Blue",prevCounts:{Blue:18,Orange:4,Silver:1,Gold:0,Platinum:0},prevNote:"テストデータ。"},
+{id:6,name:"ダイニング4（K.M.）",dept:"CD",job:"ダイニングプランナー",stage:"Blue",tenure:"1年 3ヵ月",stageTenure:"0年 5ヵ月",wage:1450,prevScore:3,prevRaise:0,prevNext:"Blue",prevCounts:{Blue:21,Orange:9,Silver:2,Gold:0,Platinum:0},prevNote:"テストデータ。"},
+{id:7,name:"ダイニング5（I.S.）",dept:"CD",job:"ダイニングプランナー",stage:"Blue",tenure:"0年11ヵ月",stageTenure:"0年 5ヵ月",wage:1450,prevScore:5,prevRaise:50,prevNext:"Orange",prevCounts:{Blue:16,Orange:10,Silver:7,Gold:0,Platinum:0},prevNote:"テストデータ：ステージアップ例。"},
+{id:8,name:"ダイニング6（K.K.）",dept:"CD",job:"ダイニングプランナー",stage:"Orange",tenure:"0年10ヵ月",stageTenure:"0年 5ヵ月",wage:1500,prevScore:3,prevRaise:0,prevNext:"Orange",prevCounts:{Blue:18,Orange:3,Silver:4,Gold:0,Platinum:0},prevNote:"テストデータ。"},
+{id:9,name:"ダイニング7（T.S.）",dept:"CD",job:"ダイニングプランナー",stage:"Blue",tenure:"0年 4ヵ月",stageTenure:"0年 4ヵ月",wage:1450,prevScore:3,prevRaise:0,prevNext:"Blue",prevCounts:{Blue:11,Orange:1,Silver:0,Gold:0,Platinum:0},prevNote:"テストデータ。"}
 ];
 
 const diningSkills = [
@@ -382,10 +382,10 @@ const kitchenSkills = [
 ["Platinum","Gold以下の要件を満たしている"],["Platinum","商品開発に携われる"],["Platinum","店舗運営の中核として改善を主導できる"]
 ];
 
-let state = JSON.parse(localStorage.getItem("cedarYouthPocV4")||"null") || {members:initialMembers, evals:{}, submitted:false};
+let state = JSON.parse(localStorage.getItem("cedarYouthPocV5")||"null") || {members:initialMembers, evals:{}, submitted:false};
 let selectedId = state.members[0].id;
 
-function save(){localStorage.setItem("cedarYouthPocV4",JSON.stringify(state));renderAll()}
+function save(){localStorage.setItem("cedarYouthPocV5",JSON.stringify(state));renderAll()}
 function resetDemo(){if(confirm("入力したデモデータを初期化しますか？")){state={members:JSON.parse(JSON.stringify(initialMembers)),evals:{},submitted:false};selectedId=1;save()}}
 function pill(stage){return `<span class="pill ${stage}">${stage}</span>`}
 function yen(n){return "¥"+Number(n||0).toLocaleString()}
