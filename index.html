@@ -66,6 +66,18 @@
   .compare{grid-template-columns:1fr}
 }
 
+
+.skill.done-prev{background:#eef8f1}
+.skill.done-new{background:#eef5ff}
+.skill .statuslabel{font-size:11px;font-weight:800;border-radius:999px;padding:4px 7px;white-space:nowrap}
+.status-prev{background:#dcfce7;color:#166534}
+.status-new{background:#dbeafe;color:#1d4ed8}
+.status-none{background:#f3f4f6;color:#6b7280}
+@media(max-width:900px){
+  .skill{grid-template-columns:34px 1fr auto!important}
+  .skill .statuslabel{font-size:10px;padding:4px 6px}
+}
+
 </style>
 </head>
 <body>
@@ -132,7 +144,7 @@
   <section id="evaluation" class="screen">
     <div class="notice success" style="margin-bottom:12px">
       <b>2Q評価モード</b><br>
-      1Qの確定結果を基準に、2Q時点で「新たにできるようになった項目」を追加チェックしてください。
+      1Qの確定結果を基準に、2Q時点で「新たにできるようになった項目」を追加チェックしてください。完了済みの項目も一覧から消えず、そのまま残ります。
     </div>
     <div class="two">
       <div>
@@ -150,7 +162,7 @@
     </div>
     <div class="section card">
       <h2>3. スキルチェック</h2>
-      <div class="notice">2Q評価ではBlue〜Platinumの全項目を確認します。通常・朝食（OR）・DU（＆）・RCP（＆）・ゼネラリスト（OR）・スペシャリスト（OR）を表示し、1Q確定値→2Qの増加数をQ評価の参考にします。</div>
+      <div class="notice">2Q評価ではダイニング全127項目を確認します（Blue 36／Orange 33／Silver 30／Gold 17／Platinum 11）。完了した項目も消さずに残し、1Q完了済＝緑、2Qで新規完了＝青、未完了＝グレーで表示します。</div>
       <div id="skillSummary" style="margin-top:12px"></div>
       <div id="skills" class="skills"></div>
     </div>
@@ -241,137 +253,133 @@ const initialMembers = [
 ];
 
 const diningSkills = [
-["Blue","通常","予約台帳の見方を理解している（名前、時間、卓番、人数、備考）"],
-["Blue","通常","ウェルカム感のあるお出迎えができる（ネームコール、笑顔、声出し等）"],
-["Blue","通常","ビールを正しく注ぐことができる"],
-["Blue","通常","フリードリンクメニューのドリンクを作成できる"],
-["Blue","通常","ワイン・スパークリングワインの抜栓ができる"],
-["Blue","通常","ワインをゲストの前で正しく注げる（規定量）"],
-["Blue","通常","お皿の3枚持ちができる"],
-["Blue","通常","PFと共にドリンクと料理を提供することができる"],
-["Blue","通常","PFからの指示で料理を提供し、説明までおこなえる"],
-["Blue","通常","担当ゾーン回遊中に得た情報（料理の食べるスピードや利用目的）をPFに報告できる"],
-["Blue","通常","PFとDUの間に入り情報伝達をおこなうことができる"],
-["Blue","通常","1WAY2JOBができている"],
-["Blue","通常","PF指定されたボトルワインをセラーから持ってくることができる"],
-["Blue","通常","適切なタイミング（グラスの1/3）でドリンクのお伺いができる"],
-["Blue","通常","POS（ハンディー）を使用してオーダーを飛ばせる"],
-["Blue","通常","ゲストから追加のオーダーを受けることができる（料理・飲料の各確認項目を含む）"],
-["Blue","通常","店内清掃ができる（床・テーブル・椅子・サイドテーブル・ソファ・入口等）"],
-["Blue","通常","自店舗のルールに従ったゴミ捨てを理解している"],
-["Blue","通常","中間バッシングができる（トレー使用・4名以上のテーブル・卓上をクリーンに保つ）"],
-["Blue","通常","テーブルリセットができる（バッシング・拭き上げ・卓上セット）"],
-["Blue","通常","サイドテーブルの管理ができる（ワイン補充・下げ物・取り皿準備・整頓）"],
-["Blue","通常","洗い場のオープン＆クローズ業務ができる"],
-["Blue","通常","ダイニングのオープン＆クローズ業務ができる"],
-["Blue","通常","ドリンク場のオープン＆クローズ業務ができる"],
-["Blue","通常","ドリンクからフードまでファーストオーダーテイクができる"],
-["Blue","朝食（OR）","店内清掃ができる"],
-["Blue","朝食（OR）","自店舗のルールに従ったゴミ捨てを理解している"],
-["Blue","朝食（OR）","中間バッシングができる"],
-["Blue","朝食（OR）","テーブルリセットができる"],
-["Blue","朝食（OR）","サイドテーブルの管理ができる（下げ物・整頓・清掃）"],
-["Blue","朝食（OR）","洗い場のオープン＆クローズ業務ができる"],
-["Blue","朝食（OR）","ウェルカム感のあるお出迎えができる（笑顔・声出し等）"],
-["Blue","朝食（OR）","顧客の退店に気が付き、元気よくお見送りができる"],
-["Blue","朝食（OR）","自店舗の商品を正しく説明でき、店舗の商品に合わせてオーダーテイクができる"],
-["Blue","朝食（OR）","お皿、カトラリーなど備品類の補充が正しくできる"],
-["Blue","朝食（OR）","お客様へラストオーダーや閉店の声掛けを回ることができる"],
-
-["Orange","通常","担当ゾーンの把握、事前情報の確認をおこないテーブル、備品の準備ができる"],
-["Orange","通常","担当ゾーンの管理、ゲストの受け入れから料理＆退店時間のコントロールができる"],
-["Orange","通常","自店舗の各種プラン、コースの内容を理解しゲストに伝えられる（料理内容・滞在時間・価格）"],
-["Orange","通常","ゲストと会話しコミュニケーションを取ることができる"],
-["Orange","通常","アラカルトの料理、ドリンクメニューの内容を理解しゲストに伝えられる"],
-["Orange","通常","本日物の内容を理解しゲストにおすすめができる"],
-["Orange","通常","アレルギー・ベジタリアンなどのイレギュラー対応の確認ができる"],
-["Orange","通常","必要な情報をDUへ共有することができる（アレルギー・滞在時間・食事スピード）"],
-["Orange","通常","ゲストの前で取り分けを行う"],
-["Orange","通常","ゲストの前でボトルワインの抜栓ができる"],
-["Orange","通常","RNへ適切な指示を出すことができる"],
-["Orange","通常","料理の食べ残しがあった場合、ゲストへヒアリングしDUへ報告できる"],
-["Orange","通常","シーンに合わせた料理・ドリンクの提案ができる（利用目的・人数）／ポーションアップ提案ができる"],
-["Orange","通常","担当テーブルの利用目的に合わせ、サービススタイルを変えることができる"],
-["Orange","通常","ゲストの人間関係や利用目的を汲み取り先読みしたサービスができる"],
-["Orange","通常","接待利用のサービスを担当できる"],
-["Orange","通常","リピートに繋がる提案やアクションをおこなうことができる"],
-["Orange","通常","オープンチェック表に基づいて適切な状態でOPENができる"],
-["Orange","通常","会計ができる（現金・クレジット・売掛・キャッシュレス・値割引・チケット）"],
-["Orange","通常","グラスワインとカルトフードのペアリング提案ができる"],
-["Orange","通常","調理法の違いによる仕上がり違いが説明できる"],
-["Orange","通常","自店舗にあるチーズの知識を持っている"],
-["Orange","通常","自店舗にある魚・鶏・豚・牛のそれぞれに合うワインを説明できる"],
-["Orange","通常","自店舗で使っているソースの仕立てを説明できる"],
-["Orange","通常","自店舗で使っているグラスワインのブドウ品種を把握している"],
-["Orange","通常","自店舗のコンセプトの説明ができる"],
-["Orange","朝食（OR）","ビュッフェ台の補充をキッチンと協力して正しくできる"],
-["Orange","朝食（OR）","朝食付ではない顧客に魅力的な説明ができ、利用を促進できる"],
-["Orange","朝食（OR）","後輩の育成や指導ができ、戦力化することができる"],
-["Orange","朝食（OR）","後輩に指示を出し、営業を円滑に行うことができる"],
-["Orange","朝食（OR）","新人スタッフ、タイミーなどの受け入れができる"],
-["Orange","朝食（OR）","料理、ドリンクのクオリティチェックができ適切な品質で提供ができる"],
-["Orange","朝食（OR）","入口での対応を不足なく行える（朝食券・会計・空席管理・ウエイティング管理）"],
-
-["Silver","DU（＆）","自店舗のデシャップスタンバイができる（アレルギー確認・プラン数・特記事項確認等）"],
-["Silver","DU（＆）","アレルギーの基本対応を把握できている（8大アレルギー・ご懐妊対応・ベジタリアン含む）"],
-["Silver","DU（＆）","オーダーシートの内容を汲み取り、料理提供順序が確認できる"],
-["Silver","DU（＆）","他テーブルの状況も視野に入れ複数卓の同時声掛けができる"],
-["Silver","DU（＆）","ダイニング＆キッチン全体の流れを見ながら料理の声掛けができる"],
-["Silver","DU（＆）","PFより依頼された商品を迅速にキッチンに声掛けができる"],
-["Silver","DU（＆）","声掛けした料理の進捗が確認できる"],
-["Silver","DU（＆）","席時間を把握し料理のタイムコントロールができる"],
-["Silver","DU（＆）","温かい商品は温かい内に、冷たい料理は冷たい内に提供できる"],
-["Silver","DU（＆）","料理の食べ残しがあった場合PFにヒアリングし報告ができる"],
-["Silver","DU（＆）","パンの品質管理ができる"],
-["Silver","DU（＆）","店の決める規定通りの料理、ドリンクのチェックができる"],
-["Silver","DU（＆）","ワインの状態をチェックしたうえで提供できる（ガス圧・味・温度等）"],
-["Silver","DU（＆）","自店舗で取り扱っているボトルワインの産地・品種・特徴を把握している"],
-["Silver","RCP（＆）","入り口をきれいに保てる（フライヤー・サイネージ・パネル・清掃・ショップカード）"],
-["Silver","RCP（＆）","気持ちのいいお出迎え・お見送りができる（謝罪・タクシー手配含む）"],
-["Silver","RCP（＆）","クローク対応ができる"],
-["Silver","RCP（＆）","ビル内共用部など施設案内ができる"],
-["Silver","RCP（＆）","レセプションのオープン＆クローズ業務ができる"],
-["Silver","RCP（＆）","電話対応ができる（プラン内容・特性を把握し提案できる）"],
-["Silver","スペシャリスト（OR）","マネージャーや時間帯責任者に協力して営業に参加し顧客満足向上に努められる"],
-["Silver","スペシャリスト（OR）","接待利用の顧客などと積極的に名刺交換ができ、自店舗の顧客として再来を促せる"],
-["Silver","スペシャリスト（OR）","名刺交換した顧客をリスト化し、店舗全体で再来アクションにつなげられる"],
-["Silver","スペシャリスト（OR）","お顔合わせを担当でき、顧客の要望に合わせたアドバイスや仕切りができる"],
-["Silver","スペシャリスト（OR）","宴席の担当対応が顧客の要望に合わせて臨機応変に対応できる"],
-["Silver","スペシャリスト（OR）","名刺交換やご挨拶で名前を売り込み、指名予約や良い口コミをもらえる"],
-["Silver","スペシャリスト（OR）","個人を特定できる悪い口コミをもらわない"],
-["Silver","朝食（OR）","社員不在時に時間帯責任者を担うことができる"],
-["Silver","朝食（OR）","朝食のレジ締めができ、日報の作成ができる"],
-["Silver","朝食（OR）","営業に関する改善案を社員に共有、提案ができる"],
-
-["Gold","ゼネラリスト（OR）","オープン前、すべての箇所の準備ができているか最終確認できる"],
-["Gold","ゼネラリスト（OR）","手が足りていないアサインのフォローが自身の判断でできる"],
-["Gold","ゼネラリスト（OR）","料理の遅れなどが出ないようDUに的確な指示が出せる"],
-["Gold","ゼネラリスト（OR）","予約状況を見て、アサイン（人件費）をコントロールできる"],
-["Gold","ゼネラリスト（OR）","ドリンクなどの発注業務ができる"],
-["Gold","ゼネラリスト（OR）","音響機器や照明などを使いこなせる"],
-["Gold","ゼネラリスト（OR）","クレームの初期対応と適切な報告ができる"],
-["Gold","スペシャリスト（OR）","他会場ヘルプでPFができる"],
-["Gold","スペシャリスト（OR）","季節替わりでドリンクの新メニューを開発できる"],
-["Gold","スペシャリスト（OR）","顧客の動向や店舗特性を理解しワインリスト更新の起案ができる"],
-["Gold","スペシャリスト（OR）","前回来店の顧客情報を所持しDU・PFに共有し、滞在価値向上提案ができる"],
-["Gold","スペシャリスト（OR）","コースやプランの変更に合わせてペアリングを商品化できる"],
-["Gold","スペシャリスト（OR）","フレンチ・イタリアン・和食等、自店舗特性に合わせた調理法を目的も併せて説明できる"],
-["Gold","スペシャリスト（OR）","キッチンの料理開発に合わせて適切なプレゼンテーションを企画しメンバーに落とし込める"],
-["Gold","スペシャリスト（OR）","自店舗の顧客に合わせてキッチンの商品開発に助言や協力ができる"],
-["Gold","スペシャリスト（OR）","自店舗でのロールプレイを用いたトレーニング実施を主導できる"],
-["Gold","スペシャリスト（OR）","DPテクニカルカレッジを受講している"],
-
-["Platinum","ゼネラリスト（OR）","クレーム対応の判断ができる"],
-["Platinum","ゼネラリスト（OR）","クリーニング手配やゲストへの振り込み情報を正しく聞くことができる"],
-["Platinum","ゼネラリスト（OR）","（テラスあり店舗）営業中雨天時、店内誘導や途中帰宅ゲストの支払額を明示できる"],
-["Platinum","ゼネラリスト（OR）","入居ビルやクライアントとの折衝ができる"],
-["Platinum","スペシャリスト（OR）","ワイン：AOC・AOP・DOC・DOCG・PDO等、スピリッツ：5大スピリッツの原産地呼称や規格を説明できる"],
-["Platinum","スペシャリスト（OR）","仕入れ値・値付け・流行を理解してメニューの更新ができる"],
-["Platinum","スペシャリスト（OR）","仕入れ値・値付け・流行を理解してワインリストの更新ができる"],
-["Platinum","スペシャリスト（OR）","オールドボトルの抜栓やデキャンタージュ等の基本ができ、他メンバーに落とし込める"],
-["Platinum","スペシャリスト（OR）","1〜3か月の短期的な振り返りを行い、FB商品の改善や開発の指示を出すことができる"],
-["Platinum","スペシャリスト（OR）","商品開発された商品の評価と改善指示ができる"],
-["Platinum","スペシャリスト（OR）","自店舗でのロールプレイトレーニング内容の設計や変更ができる"]
+["Blue", "通常", "予約台帳の見方を理解している(名前、時間、卓番、人数、備考)"],
+["Blue", "通常", "ウェルカム感のあるお出迎えができる (ネームコール、笑顔、声出し等)"],
+["Blue", "通常", "ビールを正しく注ぐことができる"],
+["Blue", "通常", "フリードリンクメニューのドリンクを作成できる"],
+["Blue", "通常", "ワイン・スパークリングワインの抜栓が出来る"],
+["Blue", "通常", "ワインをゲストの前で正しく注げる（規定量）"],
+["Blue", "通常", "お皿の3枚持ちができる"],
+["Blue", "通常", "PFと共にドリンクと料理を提供することができる"],
+["Blue", "通常", "PFからの指示で料理を提供し、説明までおこなえる"],
+["Blue", "通常", "担当ゾーン回遊中に得た情報(料理の食べるスピードや利用目的)をPFに報告できる"],
+["Blue", "通常", "PFとDUの間に入り情報伝達をおこなうことができる"],
+["Blue", "通常", "1WAY2JOBができている"],
+["Blue", "通常", "PF指定されたボトルワインをセラーから持ってくることができる"],
+["Blue", "通常", "適切なタイミング(グラスの1/3)でドリンクのお伺いができる"],
+["Blue", "通常", "POS(ハンディー)を使用してオーダーを飛ばせる"],
+["Blue", "通常", "ゲストから追加のオーダーを受けることができる (料理：ボリューム・NG・個数・調理時間・品切れ・TO可否、飲料：飲み方 ・ワインGorB確認・アルコール有無・FDかカルトか・作成時間・グラスか瓶か・容量)"],
+["Blue", "通常", "店内清掃ができる (床(ゴミ・汚れ・跡)・テーブル・椅子・サイドテーブル・ソファ・テーブル足・椅子の足 ・カーテン・パーテーション・エアコン・入口・マット・カウンター)"],
+["Blue", "通常", "自店舗のルールに従ったゴミ捨てを理解している"],
+["Blue", "通常", "中間バッシングができる (トレーを使用・4名以上のテーブル・卓上をクリーンに保てる)"],
+["Blue", "通常", "テーブルリセットができる (バッシング、テーブルの拭き上げ、卓上セット)"],
+["Blue", "通常", "サイドテーブルの管理ができる(ワインの補充、下げ物、取り皿準備、整頓)"],
+["Blue", "通常", "洗い場のオープン＆クローズ業務 (立ち上げ・シルバー回収物・洗浄機(皿・グラス)・シンク・グラス・下げ台 ・シルバー・皿・トレンチ・洗剤補充)"],
+["Blue", "通常", "ダイニングのオープン (開錠・テーブルセット・荷物置きの設置・清掃・空調のON・照明の点灯・BGMのON) ＆クローズ業務(施錠・清掃・空調のOFF・照明の消灯・BGMのOFF)ができる"],
+["Blue", "通常", "ドリンク場のオープン （ビールサーバーの立ち上げ・コーヒーマシンの立ち上げ・まな板・ダスター・ 機材・フルーツ・ジュース類の溝付け等） ＆クローズ（機材洗浄・ごみの処理）業務ができる"],
+["Blue", "通常", "ドリンクからフードまでファーストオーダーテイクができる"],
+["Blue", "朝食（OR）", "店内清掃ができる (床(ゴミ・汚れ・跡)・テーブル・椅子・サイドテーブル・ソファ・テーブル足・椅子の足 ・カーテン・パーテーション・エアコン・入口・マット・カウンター)"],
+["Blue", "朝食（OR）", "自店舗のルールに従ったゴミ捨てを理解している"],
+["Blue", "朝食（OR）", "中間バッシングができる (トレーを使用・4名以上のテーブル・卓上をクリーンに保てる)"],
+["Blue", "朝食（OR）", "テーブルリセットができる (バッシング、テーブルの拭き上げ、卓上セット)"],
+["Blue", "朝食（OR）", "サイドテーブルの管理ができる(下げ物、整頓、清掃)"],
+["Blue", "朝食（OR）", "洗い場のオープン＆クローズ業務 (立ち上げ・シルバー回収物・洗浄機(皿・グラス)・シンク・グラス・下げ台 ・シルバー・皿・トレンチ・洗剤補充)"],
+["Blue", "朝食（OR）", "ウェルカム感のあるお出迎えができる (笑顔、声出し等)"],
+["Blue", "朝食（OR）", "顧客の退店に気が付き、元気よくお見送りが出来る"],
+["Blue", "朝食（OR）", "自店舗の商品を正しく説明でき、店舗の商品に合わせてオーダーテイクが出来る"],
+["Blue", "朝食（OR）", "お皿、カトラリーなど備品類の補充が正しくできる"],
+["Blue", "朝食（OR）", "お客様へラストオーダーや閉店の声掛けを回る事が出来る"],
+["Orange", "通常", "担当ゾーンの把握、事前情報の確認をおこないテーブル、備品の準備ができる （例：子供用の椅子やカトラリーなど）"],
+["Orange", "通常", "担当ゾーンの管理、ゲストの受け入れから料理＆退店時間のコントロールができる"],
+["Orange", "通常", "自店舗の 各種プラン、コースの内容を理解しゲストに伝えられる(料理内容・滞在時間・価格)"],
+["Orange", "通常", "ゲストと会話しコミュニケーションを取る事ができる"],
+["Orange", "通常", "アラカルトの料理、ドリンクメニューの内容を理解しゲストに伝えられる"],
+["Orange", "通常", "本日物の内容を理解しゲストにおススメができる"],
+["Orange", "通常", "アレルギー・ベジタリアンなどのイレギュラー対応の確認ができる"],
+["Orange", "通常", "必要な情報をDUへ共有することができる(アレルギー・滞在時間・食事のスピード)"],
+["Orange", "通常", "ゲストの前で取り分けを行う"],
+["Orange", "通常", "ゲストの前でボトルワインの抜栓ができる"],
+["Orange", "通常", "RNへ適切な指示を出すことができる （席回転が必要な際のバッシング、リセットの指示出しをRNに行える等）"],
+["Orange", "通常", "料理の食べ残しがあった場合、ゲストへのへヒアリングしDUへ報告"],
+["Orange", "通常", "シーンに合わせた料理・ドリンクの提案ができている(利用目的・人数) ポーションアップの提案ができる"],
+["Orange", "通常", "担当テーブルの利用目的に合わせ、サービススタイルを変えることができる"],
+["Orange", "通常", "ゲストの人間関係や利用目的を汲み取り先読みしたサービスができる (自由アイテムの活用など)"],
+["Orange", "通常", "接待利用のサービスを担当できる"],
+["Orange", "通常", "リピートに繋がる提案やアクションをおこなうことができる （ワインの提供量をゲストによって変えて対応できる。 リピーター、注文をたくさんしてくれる、残り僅かなのでなど)"],
+["Orange", "通常", "オープンチェック表に基づいて適切な状態でOPENが出来る"],
+["Orange", "通常", "会計ができる (現金・クレジット・売掛・キャッシュレス・値割引き・チケット利用)"],
+["Orange", "通常", "グラスワインとカルトフードのペアリング提案ができる"],
+["Orange", "通常", "調理法の違いによる仕上がり違いが説明ができる"],
+["Orange", "通常", "自店舗にあるチーズの知識を持っている"],
+["Orange", "通常", "自店舗にある魚・鶏・豚・牛のそれぞれに合うワインを説明できる"],
+["Orange", "通常", "自店舗で使っているソースの仕立てを説明できる"],
+["Orange", "通常", "自店舗で使っているグラスワインのブドウ品種を把握している"],
+["Orange", "通常", "自店舗のコンセプトの説明ができる"],
+["Orange", "朝食（OR）", "ビュッフェ台の補充をキッチンと協力して正しくできる"],
+["Orange", "朝食（OR）", "朝食付ではない顧客に魅力的な説明が出来、利用を促進することが出来る"],
+["Orange", "朝食（OR）", "後輩の育成や指導が出来、戦力化することが出来る"],
+["Orange", "朝食（OR）", "後輩に指示を出し、営業を円滑に行うことが出来る"],
+["Orange", "朝食（OR）", "新人スタッフ、タイミーなどの受け入れが出来る"],
+["Orange", "朝食（OR）", "料理、ドリンクのクオリティチェックができ適切な品質で提供ができる"],
+["Orange", "朝食（OR）", "入口での対応を不足なく行える (朝食券、会計、空席管理、ウエイティング管理)"],
+["Silver", "DU（＆）", "自店舗のデシャップスタンバイができる (アレルギーの確認・プラン数・特記事項の確認など)"],
+["Silver", "DU（＆）", "アレルギーの基本対応を把握できている (8大アレルギーやご懐妊対応、ベジタリアン含む)"],
+["Silver", "DU（＆）", "オーダーシートの内容を汲み取り、料理提供順序が確認できる"],
+["Silver", "DU（＆）", "他テーブルの状況も視野に入れ複数卓の同時声掛けができる"],
+["Silver", "DU（＆）", "ダイニング＆キッチン全体の流れを見ながら料理の声掛けができる"],
+["Silver", "DU（＆）", "PFより依頼された商品を迅速にキッチンに声掛けができる"],
+["Silver", "DU（＆）", "声掛けした料理の進捗が確認できる"],
+["Silver", "DU（＆）", "席時間を把握し料理のタイムコントロールができる"],
+["Silver", "DU（＆）", "温かい商品は温かい内に、冷たい料理は冷たい内に提供できる"],
+["Silver", "DU（＆）", "料理の食べ残しがあった場合PFにヒアリングし報告ができる"],
+["Silver", "DU（＆）", "パンの品質管理ができる"],
+["Silver", "DU（＆）", "店の決める規定通りの料理、ドリンクのチェックができる。"],
+["Silver", "DU（＆）", "ワインの状態をチェックしたうえで提供ができる（ガス圧、味、温度のチェックなど）"],
+["Silver", "DU（＆）", "自店舗で取り扱っているボトルワインの産地・品種・特徴を把握している"],
+["Silver", "RCP（＆）", "入り口をきれいに保てる (フライヤー、サイネージ、パネル、清掃、ショップカード)"],
+["Silver", "RCP（＆）", "気持ちのいいお出迎え・お見送りができる (退店時に不満を言われた時に誠意のある謝罪やタクシー等の手配を含む)"],
+["Silver", "RCP（＆）", "クローク対応ができる (間違えない・きれいに・番号札・お土産などのお預かり品の管理と作法の理解)"],
+["Silver", "RCP（＆）", "ビル内共用部など施設案内ができる (トイレ、駐車券、駐車場、アクセス、グループ優待、周辺施設)"],
+["Silver", "RCP（＆）", "レセプションのオープン＆クローズ業務 （予約確認・台帳出力・留守電解除設定・クローク・ サイネージ看板・フライヤーショップカード）"],
+["Silver", "RCP（＆）", "電話対応ができる(プランの内容や特性を把握し提案できる)"],
+["Silver", "スペシャリスト（OR）", "マネージャーや時間帯責任者に協力をして、営業に参加でき顧客満足向上に努めることが出来る。"],
+["Silver", "スペシャリスト（OR）", "接待利用の顧客などと積極的に名刺交換が出来、自店舗の顧客として再来を促すことが出来る。"],
+["Silver", "スペシャリスト（OR）", "名刺交換した顧客をリスト化し、店舗全体で再来アクションにつなげることが出来る。"],
+["Silver", "スペシャリスト（OR）", "お顔合わせを担当することが出来、顧客の要望に合わせたアドバイスや仕切りが出来る。"],
+["Silver", "スペシャリスト（OR）", "宴席の担当対応が顧客の要望に合わせて臨機応変に対応できる。"],
+["Silver", "スペシャリスト（OR）", "名刺交換やご挨拶で名前を売り込むことが出来、指名で予約や良い口コミをもらうことが出来る"],
+["Silver", "スペシャリスト（OR）", "個人を特定できる悪い口コミをもらわない"],
+["Silver", "朝食（OR）", "社員不在時に時間帯責任者を担うことが出来る"],
+["Silver", "朝食（OR）", "朝食のレジ締めが出来、日報の作成ができる"],
+["Silver", "朝食（OR）", "営業に関する改善案を社員に共有、提案ができる"],
+["Gold", "ゼネラリスト（OR）", "オープン前、すべての箇所の準備が出来ているか最終確認をできる"],
+["Gold", "ゼネラリスト（OR）", "手が足りていないアサインのフォローが自身の判断でできる"],
+["Gold", "ゼネラリスト（OR）", "料理の遅れなどが出ないようDUに的確な指示が出せる"],
+["Gold", "ゼネラリスト（OR）", "予約状況を見て、アサイン(人件費)をコントロールできる"],
+["Gold", "ゼネラリスト（OR）", "ドリンクなどの発注業務ができる"],
+["Gold", "ゼネラリスト（OR）", "音響機器や照明などを使いこなせる"],
+["Gold", "ゼネラリスト（OR）", "クレームの初期対応と適切な報告が出来る"],
+["Gold", "スペシャリスト（OR）", "他会場ヘルプでPFができる"],
+["Gold", "スペシャリスト（OR）", "季節替わりでドリンクの新メニューを開発できる"],
+["Gold", "スペシャリスト（OR）", "顧客の動向や店舗特性を理解しワインリストの更新の起案ができる"],
+["Gold", "スペシャリスト（OR）", "前回来店の顧客情報を所持し、ＤＵ・ＰＦに共有できる またその情報に伴った滞在価値の向上提案ができる"],
+["Gold", "スペシャリスト（OR）", "コースやプランの変更に合わせてペアリングを商品化できる"],
+["Gold", "スペシャリスト（OR）", "フレンチ、イタリアン,和食等自店舗の特性に合わせた調理法を目的も併せて説明ができる"],
+["Gold", "スペシャリスト（OR）", "キッチンの料理開発に合わせて、適切なプレゼンテーションが企画出来、メンバーに落とし込める"],
+["Gold", "スペシャリスト（OR）", "自店舗の顧客に合わせてキッチンの商品開発に助言や協力ができる"],
+["Gold", "スペシャリスト（OR）", "自店舗でのロールプレイを用いたトレーニング実施の主導が出来る"],
+["Gold", "スペシャリスト（OR）", "DPテクニカルカレッジの受講"],
+["Platinum", "ゼネラリスト（OR）", "クレーム対応の判断が出来る"],
+["Platinum", "ゼネラリスト（OR）", "クリーニング手配やゲストへの振り込み情報を正しく聞くことができる"],
+["Platinum", "ゼネラリスト（OR）", "(テラスありの店舗)営業中雨天時、店内誘導や途中帰宅ゲストの支払額を明示できる"],
+["Platinum", "ゼネラリスト（OR）", "入居ビルやクライアントとの折衝が出来る"],
+["Platinum", "スペシャリスト（OR）", "ワイン：AOC.AOP.DOC.DOCG.PDOなどを理解して説明できる スピリッツ：5大スピリッツそれぞれの原産地呼称や規格を説明できる"],
+["Platinum", "スペシャリスト（OR）", "仕入れ値・値付け・流行を理解してメニューの更新をすることができる"],
+["Platinum", "スペシャリスト（OR）", "仕入れ値・値付け・流行・を理解してワインリストの更新をすることができる"],
+["Platinum", "スペシャリスト（OR）", "オールドボトルの抜栓やデキャンタージュなど、 サービスマンの基本が出来、それを他のメンバーに落とし込みできる"],
+["Platinum", "スペシャリスト（OR）", "1\\~3か月の短期的な振り返りを行い、 ＦＢ商品の改善や開発の指示を出すことができる"],
+["Platinum", "スペシャリスト（OR）", "商品開発された商品の、評価と改善指示が出来る"],
+["Platinum", "スペシャリスト（OR）", "自店舗でのロールプレイトレーニング内容の設計や変更ができる"],
 ];
 
 const kitchenSkills = [
@@ -382,20 +390,20 @@ const kitchenSkills = [
 ["Platinum","Gold以下の要件を満たしている"],["Platinum","商品開発に携われる"],["Platinum","店舗運営の中核として改善を主導できる"]
 ];
 
-let state = JSON.parse(localStorage.getItem("cedarYouthPocV5")||"null") || {members:initialMembers, evals:{}, submitted:false};
+let state = JSON.parse(localStorage.getItem("cedarYouthPocV7")||"null") || {members:initialMembers, evals:{}, submitted:false};
 let selectedId = state.members[0].id;
 
-function save(){localStorage.setItem("cedarYouthPocV5",JSON.stringify(state));renderAll()}
+function save(){localStorage.setItem("cedarYouthPocV7",JSON.stringify(state));renderAll()}
 function resetDemo(){if(confirm("入力したデモデータを初期化しますか？")){state={members:JSON.parse(JSON.stringify(initialMembers)),evals:{},submitted:false};selectedId=1;save()}}
 function pill(stage){return `<span class="pill ${stage}">${stage}</span>`}
 function yen(n){return "¥"+Number(n||0).toLocaleString()}
 function stageJa(s){return {Blue:"ブルー",Orange:"オレンジ",Silver:"シルバー",Gold:"ゴールド",Platinum:"プラチナ"}[s]||s}
-function getEval(id){const m=state.members.find(m=>m.id==id);return state.evals[id]||{score:"",evalRaise:0,nextStage:m.stage,note:"",skills:{},done:false,evaluator:"",recruitWage:1550}}
+function getEval(id){const m=state.members.find(m=>m.id==id);return state.evals[id]||{score:"",evalRaise:0,nextStage:m.stage,note:"",skills:{},prevSkills:{},done:false,evaluator:"",recruitWage:1550}}
 function skillsFor(m){return m.job.includes("キッチン")?kitchenSkills:diningSkills}
 function stageOffset(stage){return {Blue:0,Orange:50,Silver:200,Gold:300,Platinum:500}[stage]||0}
 function stageMinWage(e,m){return Number(e.recruitWage||0)+stageOffset(e.nextStage||m.stage)}
 function wageCalc(m,e){const evalRaise=Number(e.evalRaise)||0,evalWage=Number(m.wage)+evalRaise,stageMin=stageMinWage(e,m),finalWage=Math.max(evalWage,stageMin),recruitAdjust=Math.max(0,finalWage-evalWage),totalRaise=Math.max(0,finalWage-Number(m.wage));let reason="昇給なし";if(evalRaise>0&&recruitAdjust>0)reason="評価制度＋募集時給改定";else if(evalRaise>0)reason="評価制度";else if(recruitAdjust>0)reason="募集時給改定";return {evalRaise,evalWage,stageMin,finalWage,recruitAdjust,totalRaise,reason}}
-function stageCounts(m,e){const skills=skillsFor(m),out={};STAGES.forEach(st=>{const indexes=skills.map((x,i)=>[x,i]).filter(x=>x[0][0]===st).map(x=>x[1]);out[st]={total:indexes.length,current:indexes.filter(i=>e.skills&&e.skills[i]).length,prev:(m.prevCounts||{})[st]}});return out}
+function stageCounts(m,e){const skills=skillsFor(m),out={};STAGES.forEach(st=>{const indexes=skills.map((x,i)=>[x,i]).filter(x=>x[0][0]===st).map(x=>x[1]);out[st]={total:indexes.length,current:indexes.filter(i=>(e.prevSkills&&e.prevSkills[i])||(e.skills&&e.skills[i])).length,prev:(m.prevCounts||{})[st]}});return out}
 function totalGrowth(m,e){const c=stageCounts(m,e);let prev=0,current=0,known=false;STAGES.forEach(st=>{current+=c[st].current;if(c[st].prev!==undefined){prev+=c[st].prev;known=true}});return known?{prev,current,delta:current-prev}:null}
 function escapeHtml(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
 
@@ -416,9 +424,16 @@ function renderEvaluation(){
    const cats=[...new Set(idxs.map(x=>x.s.length>2?x.s[1]:"通常"))];
    const catHtml=cats.map(cat=>{
       const rows=idxs.filter(x=>(x.s.length>2?x.s[1]:"通常")===cat);
-      return `<div class="skillcat"><div class="cathead">${cat}<span>${rows.filter(x=>e.skills&&e.skills[x.i]).length}/${rows.length}</span></div>${rows.map(x=>`<label class="skill"><input type="checkbox" ${e.skills&&e.skills[x.i]?'checked':''} onchange="toggleSkill(${x.i},this.checked)"><div>${x.s.length>2?x.s[2]:x.s[1]}</div><div class="stage">${x.i+1}</div></label>`).join("")}</div>`;
+      const completed=rows.filter(x=>(e.prevSkills&&e.prevSkills[x.i])||(e.skills&&e.skills[x.i])).length;
+      return `<div class="skillcat"><div class="cathead">${cat}<span>${completed}/${rows.length}</span></div>${rows.map(x=>{
+        const wasDone=!!(e.prevSkills&&e.prevSkills[x.i]);
+        const nowDone=!!(e.skills&&e.skills[x.i]);
+        const cls=wasDone?"done-prev":(nowDone?"done-new":"");
+        const status=wasDone?`<span class="statuslabel status-prev">1Q完了済</span>`:(nowDone?`<span class="statuslabel status-new">2Q新規</span>`:`<span class="statuslabel status-none">未完了</span>`);
+        return `<label class="skill ${cls}"><input type="checkbox" ${wasDone||nowDone?'checked':''} ${wasDone?'disabled':''} onchange="toggleSkill(${x.i},this.checked)"><div>${x.s.length>2?x.s[2]:x.s[1]}<div style="margin-top:6px">${status}</div></div><div class="stage">${rows.indexOf(x)+1}</div></label>`;
+      }).join("")}</div>`;
    }).join("");
-   return `<details class="stagegroup" ${st==="Blue"||st===m.stage?'open':''}><summary class="stagehead"><b>${pill(st)} ${stageJa(st)}の要件</b><span>前回 ${c.prev===undefined?"—":c.prev} → 今回 ${c.current}/${c.total}</span></summary><div class="stageitems">${catHtml}</div></details>`}).join("");
+   return `<details class="stagegroup" open><summary class="stagehead"><b>${pill(st)} ${stageJa(st)}の要件</b><span>前回 ${c.prev===undefined?"—":c.prev} → 今回 ${c.current}/${c.total}</span></summary><div class="stageitems">${catHtml}</div></details>`}).join("");
  const warn=salaryWarning(m,e),noteSuggested=suggestedNote(m,e);
  document.getElementById("quarterForm").innerHTML=`<div class="formrow"><div class="field"><label>Q評価</label><select onchange="updateEval('score',this.value)"><option value="">選択</option>${[5,4,3,2,1].map(x=>`<option ${String(e.score)===String(x)?'selected':''}>${x}</option>`).join("")}</select></div><div class="field"><label>評価制度による時給アップ額（円）</label><input type="number" min="0" value="${e.evalRaise||0}" onchange="updateEval('evalRaise',this.value)"></div><div class="field"><label>変更後ステージ</label><select onchange="updateEval('nextStage',this.value)">${STAGES.map(s=>`<option value="${s}" ${e.nextStage===s?'selected':''}>${stageJa(s)}</option>`).join("")}</select></div></div><div class="card" style="padding:14px;background:#f8fafc;margin-bottom:10px"><div class="formrow" style="margin-bottom:0"><div class="field"><label>変更後ステージ下限時給</label><div><b>${yen(wc.stageMin)}</b></div><div class="footer-note">募集時給 ${yen(e.recruitWage||0)} ＋ ${stageOffset(e.nextStage||m.stage)}円</div></div><div class="field"><label>募集時給改定による調整額</label><div><b>${yen(wc.recruitAdjust)}</b></div><div class="footer-note">評価アップ後でも下限に届かない分</div></div><div class="field"><label>変更後の時給</label><div><b style="font-size:20px">${yen(wc.finalWage)}</b></div><div class="footer-note">${wc.reason} / 合計＋${wc.totalRaise}円</div></div></div></div><div class="field"><label>備考</label><textarea onchange="updateEval('note',this.value)" placeholder="チェック数、ステージ変更理由、時給調整理由など">${escapeHtml(e.note||"")}</textarea></div><div class="footer-note">自動メモ案：${escapeHtml(noteSuggested)}</div>${warn?`<div class="notice ${warn.type}" style="margin-top:10px">${warn.text}</div>`:""}<div class="controls" style="margin-top:12px"><button class="btn" onclick="useSuggestedNote()">自動メモを備考へ入れる</button><button class="btn primary" onclick="markDone(${m.id})">${e.done?'評価を更新保存':'この評価を完了'}</button></div>`;
 }
